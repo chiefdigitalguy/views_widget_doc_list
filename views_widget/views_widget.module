@@ -1,0 +1,76 @@
+<?php
+
+function views_widget_install(){
+  module_load_include('inc', 'views_widget', 'document_list_widget');
+  _create_document_list_widget();
+  
+}
+
+/**
+ * Implements hook_theme_registry_alter()
+ */
+function views_widget_theme_registry_alter(&$theme_registry) {
+  $module_path = drupal_get_path('module', 'views_widget');
+
+ $paragraphs_items = array(
+    'document_list_widget',
+  );
+  foreach($paragraphs_items as $item) {
+    $key = "paragraphs_item__$item";
+    $template = "paragraphs-item--$item";
+    $theme_registry[$key] = array();
+    $theme_registry[$key]['template'] = $template;
+    $theme_registry[$key]['path'] =  $module_path . '/templates';
+    $theme_registry[$key]['render element'] = 'elements';
+    $theme_registry[$key]['base hook'] = 'entity';
+    $theme_registry[$key]['type'] = 'theme_engine';
+    $theme_registry[$key]['theme path'] = $module_path;
+  }
+  
+  /*$paragraphs_items = array(
+    'document_list',
+  );
+  foreach($paragraphs_items as $item) {
+    $key = "paragraphs_item__$item";
+    $template = "paragraphs-item--$item";
+    $theme_registry[$key] = array();
+    $theme_registry[$key]['template'] = $template;
+    $theme_registry[$key]['path'] =  $module_path . '/templates';
+    $theme_registry[$key]['render element'] = 'elements';
+    $theme_registry[$key]['base hook'] = 'entity';
+    $theme_registry[$key]['type'] = 'theme_engine';
+    $theme_registry[$key]['theme path'] = $module_path;
+  } */
+
+ 
+
+  /*$paragraphs_items = array(
+    'document_list_policies',
+  );
+  foreach($paragraphs_items as $item) {
+    $key = "paragraphs_item__$item";
+    $template = "paragraphs-item--$item";
+    $theme_registry[$key] = array();
+    $theme_registry[$key]['template'] = $template;
+    $theme_registry[$key]['path'] =  $module_path . '/templates';
+    $theme_registry[$key]['render element'] = 'elements';
+    $theme_registry[$key]['base hook'] = 'entity';
+    $theme_registry[$key]['type'] = 'theme_engine';
+    $theme_registry[$key]['theme path'] = $module_path;
+  }
+
+  $paragraphs_items = array(
+    'document_list_presentations',
+  );
+  foreach($paragraphs_items as $item) {
+    $key = "paragraphs_item__$item";
+    $template = "paragraphs-item--$item";
+    $theme_registry[$key] = array();
+    $theme_registry[$key]['template'] = $template;
+    $theme_registry[$key]['path'] =  $module_path . '/templates';
+    $theme_registry[$key]['render element'] = 'elements';
+    $theme_registry[$key]['base hook'] = 'entity';
+    $theme_registry[$key]['type'] = 'theme_engine';
+    $theme_registry[$key]['theme path'] = $module_path;
+  }*/
+}

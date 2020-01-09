@@ -1,0 +1,20 @@
+<?php
+function widget_doc_list_node_info(){
+    return array(
+        'document' => array(
+        'name' => t('Upload Document'),
+        'base' => 'document',
+        'description' => t('A content type for document storage, including widget, view and paragraph bundle'),
+        'has_title' => TRUE,
+        'title_lable' => t('Upload Document')
+    )
+    );
+}
+function widget_doc_list_form($node, $form_state){
+    return node_content_form($node, $form_state);
+
+}
+//call views function
+function widget_doc_list_views_api(){
+    return array('api' => 3.0);
+}

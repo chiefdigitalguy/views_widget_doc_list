@@ -1,0 +1,198 @@
+<?php
+// stop module install if date module isn't installed first
+function widget_doc_list_requirements($phase){
+$requirements = array();
+$t = get_t();
+$date = 'date';
+if ($phase == 'install'){
+    if (!module_exists('date')){
+        $requirements['date'] = array(
+        'title' => $t('Date'),
+        'description' => $t('Module Date Was Not Installed Or Is Not Enabled, Please Resolve First.'),
+        'value' => check_plain($date),
+        'severity' => REQUIREMENT_ERROR,
+        );
+    }
+
+}
+return $requirements;
+}
+
+function widget_doc_list_install(){
+     /* set default options for content type 
+     disabled comments, promote to front page 
+     and display author/date */
+     variable_set('comment_document', 0);
+     variable_set('node_submitted_document', 0);
+     variable_set("node_options_document", array('status'));
+     
+    $t= get_t();
+
+    $content_type = array(
+        'type' => 'document',
+        'name' => 'Upload Document',
+        'base' => 'node_content',
+        //'title_label' => $t('Title'),
+        'description' => $t('A content type for document storage, including widget, view and paragraph bundle'),
+        'body_label' => $t('Upload Document'),
+        'custom' => TRUE,
+    );
+
+    $content_type = node_type_set_defaults($content_type);
+    node_add_body_field($content_type);
+    node_type_save($content_type);
+
+     //create taxonomy terms
+   $vocabulary = new stdClass();
+        $vocabulary->name = 'Upload Document Category';
+        $vocabulary->machine_name = "doc_categ";
+        $vocabulary->description = t('Upload Document Category Vocabulary');
+        $vocabulary->module = 'taxonomy';
+
+        taxonomy_vocabulary_save($vocabulary);
+
+        $vocab = taxonomy_vocabulary_machine_name_load('doc_categ');
+        
+        $term1 = (object) array(
+        'name' => 'Meetings Minutes',
+        'description' => 'ISC Meetings Minutes',
+        'vid' => $vocab->vid,
+        );
+        
+        taxonomy_term_save($term1);
+
+        $term2 = (object) array(
+        'name' => 'Policies',
+        'description' => 'ISC Policy Info',
+        'vid' => $vocab->vid,
+        );
+        
+        taxonomy_term_save($term2);
+
+        $term3 = (object) array(
+        'name' => 'Presentations',
+        'description' => 'ISC Presentations',
+        'vid' => $vocab->vid,
+        );
+        
+        taxonomy_term_save($term3);   
+
+   
+    //BASE
+    $fields = array(
+        'date_created' => array(
+            'field_name' => 'date_created',
+            'type' => 'datetime',
+            'cardinality' => 1,
+            
+        ),
+        'doc_categ' => array(
+            'field_name' => 'doc_categ',
+            'type' => 'taxonomy_term_reference',
+            'settings' => array(
+                'allowed_values' => array(
+                    0=> array(
+                    'vocabulary' => 'doc_categ',
+                    'parent' => 0
+                    ),
+                ),
+            ),
+            'cardinality' => 1,
+        /* added vocabulary settings array to load vocabulary (doc_categ) */
+        ),
+        'doc_descr' => array(
+            'field_name' => 'doc_descr',
+            'type' => 'text',
+            'cardinality' => 1,
+        ),
+        'document' => array(
+            'field_name' => 'document',
+            'type' => 'file',
+            'cardinality' => 1,
+        ),
+    );
+    foreach ( $fields as $field){
+        field_create_field($field);
+    }
+    //INSTANCES
+    $instances = array(
+        'date_created' => array(
+            'field_name' => 'date_created',
+            'label' => $t('Date Created'),
+            'required' => TRUE,
+            'widget' => array(
+                'type' => 'date_popup'
+            ),
+        ),
+        'doc_categ' => array(
+            'field_name' => 'doc_categ',
+            'label' => $t('Document Category'),
+            'required' => FALSE,
+            'widget' => array(
+                'type' => 'options_select'
+            ),
+        ),
+        'doc_descr' => array(
+            'field_name' => 'doc_descr',
+            'label' => $t('Document Description'),
+            'required' => TRUE,
+            'widget' => array(
+                'type' => 'text_textfield'
+            ),
+        ),
+        'document' => array(
+            'field_name' => 'document',
+            'label' => $t('Upload Document'),
+            'settings' => array('file_extensions' =>'doc docx ppt pptx txt pdf xls xlsx vsd vsx vsdx'),
+            'required' => TRUE,
+            'widget' => array(
+                'type' => 'file_generic'
+            ),
+        ),
+
+    );
+    foreach($instances as $instance) {
+            $instance['entity_type'] = 'node';
+            $instance['bundle'] = 'document';
+
+            field_create_instance($instance);
+        }
+
+        
+
+
+}
+
+function widget_doc_list_uninstall() {
+ 
+  $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+  $result = db_query($sql, array(':type' => 'document'));
+  $nids = array();
+  foreach ($result as $row) {
+    $nids[] = $row->nid;
+  }
+ 
+  //delete document content type and nodes
+  node_delete_multiple($nids);
+  node_type_delete('document');
+  //delete Upload Document Category Vacab and Terms
+  $vocab = taxonomy_vocabulary_machine_name_load('doc_categ');
+            taxonomy_vocabulary_delete($vocab->vid);
+  /* REMOVING FIELD REMOVE MOMENTARILY
+  $instance = array('field_name' => 'comment_body','bundle' => 'comment_node_document','entity_type' => 'comment');
+  field_delete_instance($instance);
+ 
+  $instance = array('field_name' => 'body','bundle' => 'document','entity_type' => 'node');
+  field_delete_instance($instance);
+ 
+   $fields = array_keys(_widget_doc_list_installed_fields());
+   foreach ($fields as $field) {
+      field_delete_field($field);
+  }
+ 
+  // Purge all field infromation
+   field_purge_batch(1000);*/
+
+
+    
+ }

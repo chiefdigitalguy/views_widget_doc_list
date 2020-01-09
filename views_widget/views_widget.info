@@ -1,0 +1,15 @@
+name = Upload Document List Views Widget
+description = A module for the document list content type that shows the paragraphs views widget.
+core = 7.x
+Package = "Custom Modules"
+
+dependencies[] = text
+dependencies[] = views
+dependencies[] = paragraphs
+dependencies[] = fences
+dependencies[] = widget_doc_list
+files[] = views_widget.module
+files[] = document_list_widget.inc
+
+
+
